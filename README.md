@@ -64,11 +64,7 @@ https://danteb918.github.io/Anime-Scraper/episode.html?show=one-piece&episode=10
 
 ### Documentation
 
-Full API documentation is available at:
-
-```
-https://danteb918.github.io/Anime-Scraper/documentation.html
-```
+[Full API documentation can be found here!](https://danteb918.github.io/Anime-Scraper/documentation.html)
 
 ## 🛠️ Technologies Used
 
