@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Scraper API Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+        }
+        .endpoint {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .endpoint-path {
+            background-color: #f6f8fa;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .param-table th {
+            background-color: #f1f1f1;
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        .param-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        .param-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .example {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .response-sample {
+            background-color: #f6f8fa;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .note {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Anime Scraper API Documentation</h1>
+        <p>A JavaScript-based API for scraping anime data from Anitaku/GoGoAnime</p>
+    </header>
+
+    <main>
+        <div class="endpoint">
+            <h2>Recent Episodes</h2>
+            <div class="endpoint-path">/index.html?page=2</div>
+            <p>Returns a JSON list of recent anime episodes from the Anitaku/GoGoAnime homepage.</p>
+            
+            <h3>Parameters</h3>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page</td>
+                        <td>integer</td>
+                        <td>No</td>
+                        <td>Page number for pagination (defaults to 1)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Example Request</h3>
+            <div class="example">
+                <code>GET /index.html?page=2</code>
+            </div>
+            
+            <h3>Example Response</h3>
+            <div class="response-sample">{
+  "Naruto Shippuden Episode 500": {
+    "episode": "Episode 500",
+    "img": "https://gogocdn.net/images/anime/N/naruto-shippuden.jpg",
+    "url": "https://anitaku.bz/naruto-shippuden-episode-500"
+  },
+  "One Piece Episode 1080": {
+    "episode": "Episode 1080",
+    "img": "https://gogocdn.net/images/anime/O/one-piece.jpg",
+    "url": "https://anitaku.bz/one-piece-episode-1080"
+  },
+  // More episodes...
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <h2>Episode Details</h2>
+            <div class="endpoint-path">/episode.html?show=one-piece&episode=1080</div>
+            <p>Returns detailed information about a specific anime episode, including video sources and navigation links.</p>
+            
+            <h3>Parameters</h3>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>show</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>The show name in URL-friendly format (e.g., "one-piece", "naruto-shippuden")</td>
+                    </tr>
+                    <tr>
+                        <td>episode</td>
+                        <td>integer</td>
+                        <td>Yes</td>
+                        <td>The episode number</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Example Request</h3>
+            <div class="example">
+                <code>GET /episode.html?show=one-piece&episode=1080</code>
+            </div>
+            
+            <h3>Example Response</h3>
+            <div class="response-sample">{
+  "fullTitle": "One Piece Episode 1080 English Subbed",
+  "animeName": "One Piece",
+  "episodeNumber": "1080",
+  "category": {
+    "name": "Fall 2024 Anime",
+    "url": "/sub-category/fall-2024-anime"
+  },
+  "animeUrl": "/category/one-piece",
+  "currentVideoUrl": "https://s3embtaku.pro/abpl1245?id=MjM3NzY2&title=One+Piece+Episode+1080",
+  "servers": [
+    {
+      "name": "Vidstreaming",
+      "url": "https://s3embtaku.pro/abpl1245?id=MjM3NzY2&title=One+Piece+Episode+1080",
+      "serverType": "1"
+    },
+    {
+      "name": "Gogo server",
+      "url": "https://s3embtaku.pro/embedplus?id=MjM3NzY2&token=QA7gqc8XQQ3D6alJiT90Pg&expires=1741577470",
+      "serverType": "100"
+    }
+  ],
+  "previousEpisode": {
+    "url": "/one-piece-episode-1079",
+    "title": "<< One Piece Episode 1079"
+  },
+  "nextEpisode": {
+    "url": "/one-piece-episode-1081",
+    "title": "One Piece Episode 1081 >>"
+  },
+  "relatedEpisodes": [
+    {
+      "number": "1080",
+      "url": "#",
+      "title": "0-1080"
+    }
+  ],
+  "description": "One Piece anime series, episode 1080. Watch online at Gogoanime/Anitaku.",
+  "coverImage": "https://gogocdn.net/cover/one-piece.png",
+  "scrapedTime": "2025-03-09T22:36:00.000Z",
+  "sourceUrl": "https://anitaku.bz/one-piece-episode-1080"
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <h2>Search Results</h2>
+            <div class="endpoint-path">/search.html?search=demon+slayer&page=1</div>
+            <p>Returns search results for anime based on the provided query.</p>
+            
+            <h3>Parameters</h3>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>search</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>The search query (e.g., "demon slayer", "my hero academia")</td>
+                    </tr>
+                    <tr>
+                        <td>page</td>
+                        <td>integer</td>
+                        <td>No</td>
+                        <td>Page number for pagination (defaults to 1)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Example Request</h3>
+            <div class="example">
+                <code>GET /search.html?search=demon+slayer&page=1</code>
+            </div>
+            
+            <h3>Example Response</h3>
+            <div class="response-sample">{
+  "Demon Slayer": {
+    "release": "2019",
+    "img": "https://gogocdn.net/cover/kimetsu-no-yaiba.png",
+    "url": "https://anitaku.bz/category/kimetsu-no-yaiba"
+  },
+  "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc": {
+    "release": "2023",
+    "img": "https://gogocdn.net/cover/kimetsu-no-yaiba-katanakaji-no-sato-hen.png",
+    "url": "https://anitaku.bz/category/kimetsu-no-yaiba-katanakaji-no-sato-hen"
+  },
+  "Demon Slayer Movie: Mugen Train": {
+    "release": "2020",
+    "img": "https://gogocdn.net/cover/kimetsu-no-yaiba-movie-mugen-ressha-hen.png",
+    "url": "https://anitaku.bz/category/kimetsu-no-yaiba-movie-mugen-ressha-hen"
+  },
+  // More search results...
+}</div>
+        </div>
+
+        <div class="note">
+            <h3>Important Notes</h3>
+            <ul>
+                <li>All endpoints return data in JSON format</li>
+                <li>Requests may be subject to CORS restrictions when used in browser environments</li>
+                <li>The API uses a CORS proxy (allorigins.win) to fetch data from Anitaku/GoGoAnime</li>
+                <li>Response data structure may change if the source website's HTML structure changes</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>Anime Scraper Documentation - Last Updated: March 9, 2025</p>
+    </footer>
+</body>
+</html>
