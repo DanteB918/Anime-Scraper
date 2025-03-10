@@ -1,7 +1,5 @@
 // DOM Elements
 const resultsElement = document.getElementById('results');
-const paginationTopElement = document.getElementById('pagination-top');
-const paginationBottomElement = document.getElementById('pagination-bottom');
 
 // Storage for the scraped data
 let animeData = {};
@@ -116,93 +114,6 @@ function parseAnimeData(html) {
 }
 
 /**
- * Detect pagination information from the HTML
- * @param {string} html - The HTML content
- * @returns {Object} - Object with total pages and current page
- */
-function detectPagination(html) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    // Look for pagination elements
-    const paginationList = doc.querySelector('.pagination-list');
-    if (!paginationList) {
-        return { currentPage: 1, totalPages: 1 };
-    }
-    
-    // Find the selected/current page
-    const selectedItem = paginationList.querySelector('li.selected');
-    const currentPage = selectedItem ? parseInt(selectedItem.textContent.trim()) : 1;
-    
-    // Find all page links to determine total pages
-    const pageLinks = paginationList.querySelectorAll('li a');
-    let highestPage = 1;
-    
-    pageLinks.forEach(link => {
-        const page = parseInt(link.textContent.trim());
-        if (!isNaN(page) && page > highestPage) {
-            highestPage = page;
-        }
-    });
-    
-    return { currentPage, totalPages: highestPage };
-}
-
-/**
- * Generate pagination controls
- * @param {number} currentPage - The current page number
- * @param {number} totalPages - The total number of pages
- */
-function generatePagination(currentPage, totalPages) {
-    const createPaginationHTML = () => {
-        let html = '';
-        
-        // Previous page button
-        if (currentPage > 1) {
-            html += `<a href="?page=${currentPage - 1}">Previous</a>`;
-        }
-        
-        // First page
-        if (currentPage > 3) {
-            html += `<a href="?page=1">1</a>`;
-            if (currentPage > 4) {
-                html += `<span>...</span>`;
-            }
-        }
-        
-        // Pages around current
-        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-            if (i === currentPage) {
-                html += `<a href="?page=${i}" class="current">${i}</a>`;
-            } else {
-                html += `<a href="?page=${i}">${i}</a>`;
-            }
-        }
-        
-        // Last page
-        if (currentPage < totalPages - 2) {
-            if (currentPage < totalPages - 3) {
-                html += `<span>...</span>`;
-            }
-            html += `<a href="?page=${totalPages}">${totalPages}</a>`;
-        }
-        
-        // Next page button
-        if (currentPage < totalPages) {
-            html += `<a href="?page=${currentPage + 1}">Next</a>`;
-        }
-        
-        return html;
-    };
-    
-    const paginationHTML = createPaginationHTML();
-    
-    // Update both pagination areas
-    if (paginationTopElement) paginationTopElement.innerHTML = paginationHTML;
-    if (paginationBottomElement) paginationBottomElement.innerHTML = paginationHTML;
-}
-
-/**
  * Display the results on the page
  * @param {Object} data - The data to display
  */
@@ -215,32 +126,27 @@ function displayResults(data) {
  */
 async function scrapeGoGoAnime() {
     try {
-        // Get URL parameters
+        // Get the page number from URL parameter
         const params = getUrlParams();
-        const page = params.page || '1'; // Default to page 1 if not specified
+        const page = params.page || 1;
         
-        // Add page number to the page title for reference
-        document.title = `Anime Scraper - Page ${page}`;
+        // Construct the URL with the page parameter
+        const url = page > 1 ? `https://anitaku.bz/?page=${page}` : 'https://anitaku.bz/';
         
-        // Fetch HTML from GoGoAnime/Anitaku with page parameter
-        const url = `https://anitaku.bz/home.html?page=${page}`;
         console.log(`Scraping anime data from: ${url}`);
+        resultsElement.textContent = 'Loading...';
         
+        // Fetch the HTML content
         const html = await fetchHtml(url);
-
-        // Detect pagination information
-        const paginationInfo = detectPagination(html);
-        console.log('Pagination info:', paginationInfo);
+        console.log(`Fetched HTML content, length: ${html.length}`);
         
-        // Generate pagination controls
-        generatePagination(parseInt(page), paginationInfo.totalPages);
-
         // Parse the HTML and extract anime data
         animeData = parseAnimeData(html);
-
+        
         // Display the results
         displayResults(animeData);
-        console.log(`Successfully scraped page ${page} anime data!`);
+        
+        console.log('Successfully scraped anime data!');
     } catch (error) {
         console.error('Scraping failed:', error);
         resultsElement.textContent = `Error: ${error.message}`;
@@ -252,7 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
     scrapeGoGoAnime();
 });
 
-// Run immediately if the page is already loaded
+// If the page is already loaded, run immediately
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    console.log('Page already loaded, starting scraper...');
     scrapeGoGoAnime();
 }

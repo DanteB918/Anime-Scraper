@@ -1,7 +1,5 @@
 // DOM Elements
 const resultsElement = document.getElementById('results');
-const paginationTopElement = document.getElementById('pagination-top');
-const paginationBottomElement = document.getElementById('pagination-bottom');
 
 // Storage for the scraped data
 let animeData = {};
@@ -130,143 +128,6 @@ function parseSearchResults(html) {
 }
 
 /**
- * Detect pagination information from the HTML
- * @param {string} html - The HTML content
- * @returns {Object} - Object with total pages and current page
- */
-function detectPagination(html) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    // Default values
-    let currentPage = 1;
-    let totalPages = 1;
-    
-    // Try to find pagination info
-    const paginationInfo = doc.querySelector('div.pagination');
-    if (paginationInfo) {
-        // Find current page, which is usually marked with a class like 'selected' or 'active'
-        const activePage = paginationInfo.querySelector('a.active, a.selected, span.current');
-        if (activePage) {
-            currentPage = parseInt(activePage.textContent.trim(), 10) || 1;
-        }
-        
-        // Try to find total pages
-        // Method 1: Check for a 'last page' link
-        const lastPageLink = Array.from(paginationInfo.querySelectorAll('a')).pop();
-        if (lastPageLink) {
-            const lastPageText = lastPageLink.textContent.trim();
-            if (/^\d+$/.test(lastPageText)) {
-                totalPages = parseInt(lastPageText, 10);
-            }
-        }
-        
-        // Method 2: Extract from URL if Method 1 fails
-        if (totalPages === 1 && lastPageLink) {
-            const href = lastPageLink.getAttribute('href');
-            const pageMatch = href.match(/page=(\d+)/);
-            if (pageMatch && pageMatch[1]) {
-                totalPages = parseInt(pageMatch[1], 10);
-            }
-        }
-    }
-    
-    return { currentPage, totalPages };
-}
-
-/**
- * Generate pagination controls
- * @param {number} currentPage - The current page number
- * @param {number} totalPages - The total number of pages
- */
-function generatePagination(currentPage, totalPages) {
-    // Don't show pagination if there's only one page
-    if (totalPages <= 1) {
-        paginationTopElement.innerHTML = '';
-        paginationBottomElement.innerHTML = '';
-        return;
-    }
-    
-    // Generate pagination HTML
-    let html = '<div class="pagination-container">';
-    
-    // Previous button
-    if (currentPage > 1) {
-        const prevPage = currentPage - 1;
-        const pageParams = getUrlParams();
-        pageParams.page = prevPage;
-        const queryString = new URLSearchParams(pageParams).toString();
-        html += `<a href="?${queryString}" class="pagination-link">« Previous</a>`;
-    }
-    
-    // Page numbers
-    // Show at most 5 page numbers, centered around the current page
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, startPage + 4);
-    
-    for (let i = startPage; i <= endPage; i++) {
-        const pageParams = getUrlParams();
-        pageParams.page = i;
-        const queryString = new URLSearchParams(pageParams).toString();
-        
-        if (i === currentPage) {
-            html += `<span class="pagination-link active">${i}</span>`;
-        } else {
-            html += `<a href="?${queryString}" class="pagination-link">${i}</a>`;
-        }
-    }
-    
-    // Next button
-    if (currentPage < totalPages) {
-        const nextPage = currentPage + 1;
-        const pageParams = getUrlParams();
-        pageParams.page = nextPage;
-        const queryString = new URLSearchParams(pageParams).toString();
-        html += `<a href="?${queryString}" class="pagination-link">Next »</a>`;
-    }
-    
-    html += '</div>';
-    
-    // Set the pagination HTML to both top and bottom containers
-    paginationTopElement.innerHTML = html;
-    paginationBottomElement.innerHTML = html;
-    
-    // Add some basic styling
-    const style = document.createElement('style');
-    style.textContent = `
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            font-family: Arial, sans-serif;
-        }
-        .pagination-link {
-            padding: 8px 12px;
-            margin: 0 4px;
-            text-decoration: none;
-            background-color: #f0f0f0;
-            color: #333;
-            border-radius: 3px;
-            transition: background-color 0.2s;
-        }
-        .pagination-link:hover {
-            background-color: #e0e0e0;
-        }
-        .pagination-link.active {
-            background-color: #4CAF50;
-            color: white;
-            cursor: default;
-        }
-    `;
-    
-    // Add the style to the head if it doesn't exist already
-    if (!document.querySelector('style#pagination-style')) {
-        style.id = 'pagination-style';
-        document.head.appendChild(style);
-    }
-}
-
-/**
  * Display the results on the page
  * @param {Object} data - The data to display
  */
@@ -304,13 +165,6 @@ async function scrapeSearchResults() {
         
         // Parse the search results
         animeData = parseSearchResults(html);
-        
-        // Detect pagination information
-        const { currentPage, totalPages } = detectPagination(html);
-        console.log(`Pagination: ${currentPage} / ${totalPages}`);
-        
-        // Generate pagination controls
-        generatePagination(currentPage, totalPages);
         
         // Display the results
         displayResults(animeData);
