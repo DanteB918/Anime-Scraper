@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Episode Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        #results {
+            white-space: pre-wrap;
+            font-family: monospace;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <pre id="results">No data yet.</pre>
+
+    <script>
+        // Get URL parameters function
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            
+            for (const [key, value] of urlParams) {
+                params[key] = value;
+            }
+            
+            return params;
+        }
+
+        // Check if we have show and episode parameters
+        const params = getUrlParams();
+        if (params.show && params.episode) {
+            // Use the actual show and episode from URL parameters
+            const show = params.show;
+            const episode = params.episode;
+            const url = `https://anitaku.bz/${show}-episode-${episode}`;
+            
+            // The episode-scraper.js will handle the actual scraping
+            // We just need to override the window.location.href for the scraper to use
+            window.animeEpisodeUrl = url;
+            
+            // Add an event listener to capture the scraped data
+            document.addEventListener('episodeDataScraped', function(e) {
+                document.getElementById('results').textContent = JSON.stringify(e.detail, null, 2);
+            });
+        }
+    </script>
+
+    <script src="episode-scraper.js"></script>
+</body>
+</html>
