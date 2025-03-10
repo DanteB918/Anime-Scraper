@@ -1,6 +1,9 @@
 # 🎬 Anime Scraper
 
-![Anime Scraper Banner](https://i.imgur.com/xP8VvnA.png)
+Powered By:
+
+![image](https://github.com/user-attachments/assets/732808e9-6aad-4761-9e60-80baa6589dfa)
+
 
 > A lightweight JavaScript-based web scraper for retrieving anime information from GoGoAnime/Anitaku for **educational purposes only**.
 
