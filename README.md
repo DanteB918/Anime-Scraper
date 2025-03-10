@@ -17,6 +17,10 @@ This project was created for **purely educational purposes** to demonstrate web 
 
 **I, the creator of this tool, assume no liability for any misuse of this software.**
 
+## 📝 To Note:
+
+Currently, this project RELIES on `https://anitaku.bz/`, if for whatever reason they go down, this goes down.
+
 ## ✨ Features
 
 - 📺 Scrape recent anime episodes from the homepage
