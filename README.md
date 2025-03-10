@@ -37,13 +37,13 @@ Currently, this project RELIES on `https://anitaku.bz/`, if for whatever reason 
 Access the homepage to see the most recent anime episodes:
 
 ```
-http://localhost:8080/index.html
+https://danteb918.github.io/Anime-Scraper/index.html
 ```
 
 Pagination is supported via URL parameter:
 
 ```
-http://localhost:8080/index.html?page=2
+https://danteb918.github.io/Anime-Scraper/index.html?page=2
 ```
 
 ### Search for Anime
@@ -51,7 +51,7 @@ http://localhost:8080/index.html?page=2
 Search for anime titles:
 
 ```
-http://localhost:8080/search.html?search=demon+slayer
+https://danteb918.github.io/Anime-Scraper/search.html?search=demon+slayer
 ```
 
 ### Episode Details
@@ -59,7 +59,7 @@ http://localhost:8080/search.html?search=demon+slayer
 Get detailed information about a specific episode:
 
 ```
-http://localhost:8080/episode.html?show=one-piece&episode=1080
+https://danteb918.github.io/Anime-Scraper/episode.html?show=one-piece&episode=1080
 ```
 
 ### Documentation
@@ -67,7 +67,7 @@ http://localhost:8080/episode.html?show=one-piece&episode=1080
 Full API documentation is available at:
 
 ```
-http://localhost:8080/documentation.html
+https://danteb918.github.io/Anime-Scraper/documentation.html
 ```
 
 ## 🛠️ Technologies Used
