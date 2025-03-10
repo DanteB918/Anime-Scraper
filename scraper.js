@@ -126,27 +126,25 @@ function displayResults(data) {
  */
 async function scrapeGoGoAnime() {
     try {
-        // Get the page number from URL parameter
+        // Get URL parameters
         const params = getUrlParams();
-        const page = params.page || 1;
+        const page = params.page || '1'; // Default to page 1 if not specified
         
-        // Construct the URL with the page parameter
-        const url = page > 1 ? `https://anitaku.bz/?page=${page}` : 'https://anitaku.bz/';
-        
+        // Add page number to the page title for reference
+        document.title = `Anime Scraper - Page ${page}`;
+
+        // Fetch HTML from GoGoAnime/Anitaku with page parameter
+        const url = `https://anitaku.bz/home.html?page=${page}`;
         console.log(`Scraping anime data from: ${url}`);
-        resultsElement.textContent = 'Loading...';
-        
-        // Fetch the HTML content
+
         const html = await fetchHtml(url);
-        console.log(`Fetched HTML content, length: ${html.length}`);
-        
+
         // Parse the HTML and extract anime data
         animeData = parseAnimeData(html);
-        
+
         // Display the results
         displayResults(animeData);
-        
-        console.log('Successfully scraped anime data!');
+        console.log(`Successfully scraped page ${page} anime data!`);
     } catch (error) {
         console.error('Scraping failed:', error);
         resultsElement.textContent = `Error: ${error.message}`;
@@ -158,8 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scrapeGoGoAnime();
 });
 
-// If the page is already loaded, run immediately
+// Run immediately if the page is already loaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    console.log('Page already loaded, starting scraper...');
     scrapeGoGoAnime();
 }
