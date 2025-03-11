@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anitaku Scraper Browser Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #444;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            background-color: white;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #searchInput {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #searchButton:hover {
+            background-color: #45a049;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        #results, #searchResults, #episodeResults {
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        #episodeUrlInput {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        #episodeButton {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #episodeButton:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <h1>Anitaku Scraper Browser Example</h1>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="recent">Recent Episodes</div>
+        <div class="tab" data-tab="search">Search Anime</div>
+        <div class="tab" data-tab="episode">Episode Info</div>
+    </div>
+    
+    <div id="loading">Loading... Please wait...</div>
+    
+    <div id="recentTab" class="tab-content active">
+        <h2>Recent Anime Episodes</h2>
+        <div>
+            <button id="loadRecentButton">Load Recent Episodes</button>
+            <select id="pageSelector">
+                <option value="1">Page 1</option>
+                <option value="2">Page 2</option>
+                <option value="3">Page 3</option>
+                <option value="4">Page 4</option>
+                <option value="5">Page 5</option>
+            </select>
+        </div>
+        <div id="results">Click "Load Recent Episodes" to fetch data</div>
+    </div>
+    
+    <div id="searchTab" class="tab-content">
+        <h2>Search Anime</h2>
+        <div>
+            <input type="text" id="searchInput" placeholder="Enter anime title...">
+            <button id="searchButton">Search</button>
+        </div>
+        <div id="searchResults">Enter a search term and click "Search"</div>
+    </div>
+    
+    <div id="episodeTab" class="tab-content">
+        <h2>Episode Information</h2>
+        <div>
+            <input type="text" id="episodeUrlInput" placeholder="Enter anime URL (e.g., /category/one-piece)">
+            <button id="episodeButton">Get Episodes</button>
+        </div>
+        <div id="episodeResults">Enter an anime URL and click "Get Episodes"</div>
+    </div>
+
+    <!-- Include the browser version of the library -->
+    <!-- In a real environment, use the CDN or bundle -->
+    <script src="../browser.js"></script>
+    
+    <script>
+        // Create a new instance
+        const scraper = new AnitakuScraper();
+        
+        // DOM Elements
+        const tabButtons = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const loadingElement = document.getElementById('loading');
+        const loadRecentButton = document.getElementById('loadRecentButton');
+        const pageSelector = document.getElementById('pageSelector');
+        const resultsElement = document.getElementById('results');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchResults = document.getElementById('searchResults');
+        const episodeUrlInput = document.getElementById('episodeUrlInput');
+        const episodeButton = document.getElementById('episodeButton');
+        const episodeResults = document.getElementById('episodeResults');
+        
+        // Tab functionality
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                
+                // Update active tab button
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update active tab content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabName}Tab`).classList.add('active');
+            });
+        });
+        
+        // Load recent episodes
+        loadRecentButton.addEventListener('click', async () => {
+            const page = pageSelector.value;
+            loadingElement.style.display = 'block';
+            resultsElement.textContent = 'Loading...';
+            
+            try {
+                const data = await scraper.scrapeHomePage(page);
+                resultsElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsElement.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        });
+        
+        // Search for anime
+        searchButton.addEventListener('click', async () => {
+            const keyword = searchInput.value.trim();
+            if (!keyword) {
+                searchResults.textContent = 'Please enter a search term';
+                return;
+            }
+            
+            loadingElement.style.display = 'block';
+            searchResults.textContent = 'Searching...';
+            
+            try {
+                const data = await scraper.searchAnime(keyword);
+                searchResults.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                searchResults.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        });
+        
+        // Get episode information
+        episodeButton.addEventListener('click', async () => {
+            const url = episodeUrlInput.value.trim();
+            if (!url) {
+                episodeResults.textContent = 'Please enter an anime URL';
+                return;
+            }
+            
+            loadingElement.style.display = 'block';
+            episodeResults.textContent = 'Loading episode data...';
+            
+            try {
+                const data = await scraper.scrapeEpisodes(url);
+                episodeResults.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                episodeResults.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        });
+        
+        // Enter key functionality for search
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+        
+        // Enter key functionality for episode URL
+        episodeUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                episodeButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
