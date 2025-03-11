@@ -88,6 +88,54 @@
         #episodeButton:hover {
             background-color: #0b7dda;
         }
+        .anime-result {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .anime-result img {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .result-info {
+            display: inline-block;
+            vertical-align: top;
+        }
+        .result-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .result-episode {
+            margin-bottom: 10px;
+        }
+        .result-link {
+            text-decoration: none;
+            color: #337ab7;
+        }
+        .anime-details {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .anime-details-content {
+            display: flex;
+        }
+        .anime-details-content img {
+            width: 150px;
+            height: 150px;
+            margin-right: 20px;
+        }
+        .episode-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -113,7 +161,7 @@
                 <option value="5">Page 5</option>
             </select>
         </div>
-        <div id="results">Click "Load Recent Episodes" to fetch data</div>
+        <div id="resultsContainer"></div>
     </div>
     
     <div id="searchTab" class="tab-content">
@@ -122,7 +170,7 @@
             <input type="text" id="searchInput" placeholder="Enter anime title...">
             <button id="searchButton">Search</button>
         </div>
-        <div id="searchResults">Enter a search term and click "Search"</div>
+        <div id="searchResultsContainer"></div>
     </div>
     
     <div id="episodeTab" class="tab-content">
@@ -148,10 +196,10 @@
         const loadingElement = document.getElementById('loading');
         const loadRecentButton = document.getElementById('loadRecentButton');
         const pageSelector = document.getElementById('pageSelector');
-        const resultsElement = document.getElementById('results');
+        const resultsContainer = document.getElementById('resultsContainer');
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
-        const searchResults = document.getElementById('searchResults');
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
         const episodeUrlInput = document.getElementById('episodeUrlInput');
         const episodeButton = document.getElementById('episodeButton');
         const episodeResults = document.getElementById('episodeResults');
@@ -175,15 +223,36 @@
         loadRecentButton.addEventListener('click', async () => {
             const page = pageSelector.value;
             loadingElement.style.display = 'block';
-            resultsElement.textContent = 'Loading...';
+            resultsContainer.innerHTML = '';
             
             try {
                 const data = await scraper.scrapeHomePage(page);
-                resultsElement.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                resultsElement.textContent = `Error: ${error.message}`;
-            } finally {
+                
+                // Display results
                 loadingElement.style.display = 'none';
+                
+                if (data.results.length === 0) {
+                    resultsContainer.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    // Display each anime result
+                    data.results.forEach(anime => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'anime-result';
+                        
+                        resultElement.innerHTML = `
+                            <img src="${anime.img}" alt="${anime.title}">
+                            <div class="result-info">
+                                <div class="result-title">${anime.title}</div>
+                                <div class="result-episode">${anime.episode}</div>
+                                <a href="${anime.url}" target="_blank" class="result-link">View Details</a>
+                            </div>
+                        `;
+                        
+                        resultsContainer.appendChild(resultElement);
+                    });
+                }
+            } catch (error) {
+                resultsContainer.textContent = `Error: ${error.message}`;
             }
         });
         
@@ -191,24 +260,45 @@
         searchButton.addEventListener('click', async () => {
             const keyword = searchInput.value.trim();
             if (!keyword) {
-                searchResults.textContent = 'Please enter a search term';
+                searchResultsContainer.textContent = 'Please enter a search term';
                 return;
             }
             
             loadingElement.style.display = 'block';
-            searchResults.textContent = 'Searching...';
+            searchResultsContainer.innerHTML = '';
             
             try {
                 const data = await scraper.searchAnime(keyword);
-                searchResults.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                searchResults.textContent = `Error: ${error.message}`;
-            } finally {
+                
+                // Display results
                 loadingElement.style.display = 'none';
+                
+                if (data.results.length === 0) {
+                    searchResultsContainer.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    // Display each anime result
+                    data.results.forEach(anime => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'anime-result';
+                        
+                        resultElement.innerHTML = `
+                            <img src="${anime.image}" alt="${anime.title}">
+                            <div class="result-info">
+                                <div class="result-title">${anime.title}</div>
+                                <div class="result-episode">${anime.released || 'No release info'}</div>
+                                <a href="${anime.url}" target="_blank" class="result-link">View Details</a>
+                            </div>
+                        `;
+                        
+                        searchResultsContainer.appendChild(resultElement);
+                    });
+                }
+            } catch (error) {
+                searchResultsContainer.textContent = `Error: ${error.message}`;
             }
         });
         
-        // Get episode information
+        // Fetch episodes for a specific anime
         episodeButton.addEventListener('click', async () => {
             const url = episodeUrlInput.value.trim();
             if (!url) {
@@ -217,15 +307,42 @@
             }
             
             loadingElement.style.display = 'block';
-            episodeResults.textContent = 'Loading episode data...';
+            episodeResults.textContent = 'Loading...';
             
             try {
                 const data = await scraper.scrapeEpisodes(url);
-                episodeResults.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                episodeResults.textContent = `Error: ${error.message}`;
-            } finally {
+                
+                // Display results
                 loadingElement.style.display = 'none';
+                
+                // Format the episode data in a structured way
+                let html = `
+                    <div class="anime-details">
+                        <h2>${data.results.title}</h2>
+                        <div class="anime-details-content">
+                            <img src="${data.results.image}" alt="${data.results.title}">
+                            <div>
+                                <p>${data.results.description}</p>
+                                <h3>Episodes:</h3>
+                                <ul class="episode-list">
+                `;
+                
+                // Add episode ranges
+                data.results.episodes.forEach(range => {
+                    html += `<li>Episodes ${range.start} - ${range.end}</li>`;
+                });
+                
+                html += `
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                episodeResults.innerHTML = html;
+            } catch (error) {
+                loadingElement.style.display = 'none';
+                episodeResults.textContent = `Error: ${error.message}`;
             }
         });
         

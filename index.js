@@ -45,7 +45,8 @@ export class AnitakuScraper {
     
     console.log('Found anime items:', animeItems.length);
     
-    const result = {};
+    // Change from object to array to store results
+    const results = [];
     
     animeItems.each((index, item) => {
       const $item = $(item);
@@ -81,18 +82,20 @@ export class AnitakuScraper {
         const absoluteImgUrl = imgSrc.startsWith('http') ? imgSrc : 
                              (imgSrc.startsWith('/') ? `${this.baseUrl}${imgSrc}` : 
                              `${this.baseUrl}/${imgSrc}`);
-        
-        result[title] = {
+
+        // Push to results array instead of using title as key
+        results.push({
+          "title": title,
           "episode": episode,
           "img": absoluteImgUrl,
           "url": absoluteUrl
-        };
+        });
       }
     });
 
-    console.log('Total parsed anime entries:', Object.keys(result).length);
+    console.log('Total parsed anime entries:', results.length);
 
-    return result;
+    return { results };
   }
 
   /**
@@ -122,7 +125,7 @@ export class AnitakuScraper {
   /**
    * Scrape episode data from a specific anime URL
    * @param {string} animeUrl - The URL of the anime to scrape episodes for
-   * @returns {Promise<Object>} - Object with episode data
+   * @returns {Promise<Object>} - Object with episode data in 'results' property
    */
   async scrapeEpisodes(animeUrl) {
     try {
@@ -162,7 +165,7 @@ export class AnitakuScraper {
         episodes: episodes
       };
       
-      return result;
+      return { results: result };
     } catch (error) {
       console.error('Episode scraping failed:', error);
       throw error;
@@ -172,7 +175,7 @@ export class AnitakuScraper {
   /**
    * Search for anime by keyword
    * @param {string} keyword - The keyword to search for
-   * @returns {Promise<Object>} - Object with search results
+   * @returns {Promise<Object>} - Object with search results in 'results' property
    */
   async searchAnime(keyword) {
     try {
@@ -208,7 +211,7 @@ export class AnitakuScraper {
         });
       });
       
-      return results;
+      return { results };
     } catch (error) {
       console.error('Search failed:', error);
       throw error;

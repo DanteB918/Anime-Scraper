@@ -46,7 +46,8 @@ class AnitakuScraper {
     
     console.log('Found anime items:', animeItems.length);
     
-    const result = {};
+    // Change from object to array to store results
+    const results = [];
     
     animeItems.forEach((item, index) => {
       // Extract elements
@@ -81,17 +82,19 @@ class AnitakuScraper {
                                (imgSrc.startsWith('/') ? `${this.baseUrl}${imgSrc}` : 
                                `${this.baseUrl}/${imgSrc}`);
         
-        result[title] = {
+        // Push to results array instead of using title as key
+        results.push({
+          "title": title,
           "episode": episode,
           "img": absoluteImgUrl,
           "url": absoluteUrl
-        };
+        });
       }
     });
 
-    console.log('Total parsed anime entries:', Object.keys(result).length);
+    console.log('Total parsed anime entries:', results.length);
 
-    return result;
+    return { results };
   }
 
   /**
@@ -121,6 +124,7 @@ class AnitakuScraper {
   /**
    * Scrape episode data from a specific anime URL
    * This is a simplified version for browser use
+   * @returns {Promise<Object>} - Object with episode data in 'results' property
    */
   async scrapeEpisodes(animeUrl) {
     try {
@@ -160,7 +164,7 @@ class AnitakuScraper {
         episodes: episodes
       };
       
-      return result;
+      return { results: result };
     } catch (error) {
       console.error('Episode scraping failed:', error);
       throw error;
@@ -170,7 +174,7 @@ class AnitakuScraper {
   /**
    * Search for anime by keyword
    * @param {string} keyword - The keyword to search for
-   * @returns {Promise<Object>} - Object with search results
+   * @returns {Promise<Object>} - Object with search results in 'results' property
    */
   async searchAnime(keyword) {
     try {
@@ -207,7 +211,7 @@ class AnitakuScraper {
         }
       });
       
-      return results;
+      return { results };
     } catch (error) {
       console.error('Search failed:', error);
       throw error;
